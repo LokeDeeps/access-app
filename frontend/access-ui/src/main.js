@@ -8,11 +8,10 @@ tabs.forEach(function (btn) {
     panels.forEach(function (p) { p.classList.remove('active'); });
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    if (btn.dataset.tab === 'fun') growTree();
   });
 });
 
-// ---- PIN (вкладка "Главная") ----
+// ---- Логика входа (PIN) ----
 var app = document.querySelector('#tab-main .card');
 var pin = document.getElementById('pin');
 var btn = document.getElementById('go');
@@ -32,78 +31,76 @@ btn.addEventListener('click', function () {
   }
 });
 
-// ---- Растущее дерево в горшке ----
-var LEAVES = '葉枝花榮茂椛樺桂森楠苔萱蘭蕾華茂盛榮翠菁菱蕨蕾蔓藤薜荔萝荷菊楓梅柳桜';
-var TRUNK = '木';
-var ROOTS = '根';
+// ---- Логика заметок (Obsidian-like) ----
+var noteTextarea = document.getElementById('note-content');
+var saveNoteBtn = document.getElementById('save-note');
+var noteStatus = document.getElementById('note-status');
 
-// Горшок из символов (ширина задана под кадр 30 знаков)
-var POT = [
-  '   ╭───────────────╮   ',
-  '  ╭╯               ╰╮  ',
-  ' ╭╯   土  器  土   ╰╮  ',
-  ' ╰╮               ╭╯  ',
-  '  ╰╮             ╭╯   ',
-  '   ╰─────────────╯    ',
-  '  ╰╮             ╭╯   ',
-  '   ╰─────────────╯    '
-];
-
-function buildTree() {
-  var width = 23;          // ширина кроны
-  var crown = 13;          // строк кроны
-  var trunk = 5;           // строк ствола
-  var lines = [];
-
-  // Крона: широкая, плотная, до width знаков в строке
-  for (var i = 0; i < crown; i++) {
-    // ширина слоя растёт от 5 до width, с лёгкой "рваностью" краёв
-    var base = 5 + Math.floor((i / crown) * (width - 5));
-    var wobble = Math.floor(Math.random() * 5) - 2;
-    var w = Math.max(4, Math.min(width, base + wobble));
-    var pad = Math.floor((width - w) / 2) + 3;
-    var row = '';
-    for (var c = 0; c < w; c++) {
-      row += Math.random() < 0.12
-        ? ' '  // просветы, чтобы крона дышала
-        : LEAVES.charAt(Math.floor(Math.random() * LEAVES.length));
-    }
-    lines.push(' '.repeat(pad) + row);
-  }
-
-  // Ствол: три 木 в ряд
-  var tp = Math.floor(width / 2) + 1;
-  for (var t = 0; t < trunk; t++) {
-    lines.push(' '.repeat(tp - 1) + TRUNK + TRUNK + TRUNK);
-  }
-
-  // Корни над горшком
-  lines.push(' '.repeat(tp - 2) + ROOTS + ROOTS + TRUNK + ROOTS + ROOTS);
-
-  // Горшок
-  POT.forEach(function (p) { lines.push(p); });
-
-  return lines;
+// Загружаем заметку при старте
+var savedNote = localStorage.getItem('user_note');
+if (savedNote) {
+  noteTextarea.value = savedNote;
 }
 
-var treeEl = document.getElementById('tree');
-var timer = null;
+saveNoteBtn.addEventListener('click', function () {
+  var content = noteTextarea.value;
+  localStorage.setItem('user_note', content);
+  noteStatus.textContent = 'Заметка сохранена в хранилище браузера!';
+  noteStatus.style.color = '#55efc4';
+  setTimeout(function() { noteStatus.textContent = ''; }, 3000);
+});
 
-function growTree() {
-  clearInterval(timer);
-  treeEl.textContent = '';
-  treeEl.style.color = '#7bed9f';
-  var lines = buildTree();
-  var i = 0;
-  // Растёт снизу вверх: рисуем с последней строки к первой
-  timer = setInterval(function () {
-    treeEl.textContent = lines[lines.length - 1 - i] + '\n' + treeEl.textContent;
-    i++;
-    if (i >= lines.length) {
-      clearInterval(timer);
-      treeEl.style.color = '#f9ca24'; // крона "золотеет"
-    }
-  }, 450);
+// ---- Логика таблицы (CRUD Lite) ----
+var tableBody = document.getElementById('table-body');
+var rowNameInput = document.getElementById('row-name');
+var rowStatusInput = document.getElementById('row-status');
+var addRowBtn = document.getElementById('add-row');
+
+// Инициализация данных
+var tableData = JSON.parse(localStorage.getItem('user_table')) || ;
+var nextId = tableData.length > 0 ? Math.max(...tableData.map(r => r.id)) + 1 : 1;
+
+function renderTable() {
+  tableBody.innerHTML = '';
+  tableData.forEach(function (row) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>#\${row.id}</td>
+      <td>\${row.name}</td>
+      <td>\${row.status}</td>
+      <td><button onclick="removeRow(\${row.id})" style="background:#ff7675; border:none; color:white; padding:4px 8px; border-radius:4px; cursor:pointer;">Удалить</button></td>
+    `;
+    tableBody.appendChild(tr);
+  });
+  // Сохраняем состояние таблицы
+  localStorage.setItem('user_table', JSON.stringify(tableData));
 }
 
-document.getElementById('grow').addEventListener('click', growTree);
+// Функция удаления (глобальная, чтобы работать из onclick)
+window.removeRow = function(id) {
+  tableData = tableData.filter(r => r.id !== id);
+  renderTable();
+};
+
+addRowBtn.addEventListener('click', function () {
+  var name = rowNameInput.value.trim();
+  var status = rowStatusInput.value.trim();
+  
+  if (!name) {
+    alert('Введите название!');
+    return;
+  }
+
+  tableData.push({
+    id: nextId++,
+    name: name,
+    status: status || 'Новый'
+  });
+  
+  rowNameInput.value = '';
+  rowStatusInput.value = '';
+  renderTable();
+});
+
+// Отрисовка при загрузке
+renderTable();

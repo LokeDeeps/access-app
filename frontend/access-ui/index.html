@@ -9,16 +9,17 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       color: #eee;
-      background: #0d0b16;
+      background: #0d0b16; /* Твой тёмный фон */
       overflow-x: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
     }
-    /* Переливающиеся пятна фона */
+
+    /* --- Твой переливающийся фон (оставляем как есть) --- */
     .blob {
       position: fixed;
       border-radius: 50%;
@@ -45,19 +46,11 @@
       bottom: -10vmax; left: 20vmax;
       animation: driftC 22s ease-in-out infinite alternate;
     }
-    @keyframes driftA {
-      from { transform: translate(0, 0) scale(1); }
-      to   { transform: translate(30vmax, 22vmax) scale(1.25); }
-    }
-    @keyframes driftB {
-      from { transform: translate(0, 0) scale(1.2); }
-      to   { transform: translate(-25vmax, -18vmax) scale(0.9); }
-    }
-    @keyframes driftC {
-      from { transform: translate(0, 0) scale(0.9); }
-      to   { transform: translate(18vmax, -20vmax) scale(1.3); }
-    }
+    @keyframes driftA { from { transform: translate(0, 0) scale(1); } to { transform: translate(30vmax, 22vmax) scale(1.25); } }
+    @keyframes driftB { from { transform: translate(0, 0) scale(1.2); } to { transform: translate(-25vmax, -18vmax) scale(0.9); } }
+    @keyframes driftC { from { transform: translate(0, 0) scale(0.9); } to { transform: translate(18vmax, -20vmax) scale(1.3); } }
 
+    /* --- Навигация (вкладки) --- */
     nav {
       display: flex;
       gap: 10px;
@@ -82,55 +75,90 @@
       background: rgba(108, 92, 231, 0.3);
       box-shadow: 0 0 14px rgba(165, 94, 234, 0.5);
     }
+
+    /* --- Панели (экраны) --- */
     .panel { display: none; width: 100%; max-width: 420px; padding: 0 16px 24px; }
     .panel.active { display: block; }
+
+    /* --- Карточки в стиле Obsidian/референса --- */
     .card {
-      text-align: center;
-      padding: 24px;
+      text-align: left;
+      padding: 20px;
       border-radius: 16px;
-      background: rgba(36, 28, 62, 0.75);
-      border: 2px solid #4a4a6a;
+      background: rgba(255, 255, 255, 0.08); /* Полупрозрачная белая карточка */
+      border: 1px solid rgba(255, 255, 255, 0.1);
       margin-top: 12px;
+      backdrop-filter: blur(10px);
     }
-    input {
-      width: 100%; padding: 12px; font-size: 20px; text-align: center;
-      border: 2px solid #4a4a6a; border-radius: 8px; background: rgba(13, 11, 22, 0.8);
-      color: #eee; margin: 12px 0;
-    }
-    input:focus { outline: none; border-color: #a55eea; }
-    button.act {
-      width: 100%; padding: 12px; font-size: 18px;
-      border: 2px solid #a55eea; border-radius: 8px;
-      background: #6c5ce7; color: #fff; cursor: pointer;
-    }
-    #msg { min-height: 20px; color: #ff7675; }
-    #tree {
-      background: rgba(13, 11, 22, 0.7);
-      border: 2px solid #4a4a6a;
-      border-radius: 16px;
-      padding: 14px 4px;
-      margin-top: 12px;
-      min-height: 430px;
+    .card h3 { margin-top: 0; color: #fff; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+
+    /* --- Поля ввода и кнопки (стиль референса) --- */
+    input, textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
       font-size: 16px;
-      line-height: 1.15;
-      color: #7bed9f;
-      white-space: pre;
-      overflow: hidden;
-      text-align: center;
+      margin-bottom: 12px;
+      outline: none;
     }
-    #grow { margin-top: 14px; }
+    input:focus, textarea:focus { border-color: #a55eea; box-shadow: 0 0 12px rgba(165, 94, 234, 0.3); }
+
+    button.act {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: #6c5ce7;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    button.act:active { transform: scale(0.98); }
+    button.act:hover { box-shadow: 0 6px 18px rgba(108, 92, 231, 0.4); }
+
+    /* --- Таблица (стиль Obsidian) --- */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #ddd;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    th {
+      background: rgba(255, 255, 255, 0.05);
+      color: #aaa;
+      font-weight: 600;
+    }
+    tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+    #msg { min-height: 20px; color: #ff7675; font-size: 14px; margin-top: 10px; }
   </style>
 </head>
 <body>
+  <!-- Фон -->
   <div class="blob blob-a"></div>
   <div class="blob blob-b"></div>
   <div class="blob blob-c"></div>
 
+  <!-- Вкладки -->
   <nav>
     <button class="tab active" data-tab="main">Главная</button>
-    <button class="tab" data-tab="fun">Приколюха 🌳</button>
+    <button class="tab" data-tab="notes">Заметки</button>
   </nav>
 
+  <!-- Экран 1: Вход -->
   <section id="tab-main" class="panel active">
     <div class="card">
       <h1>Access</h1>
@@ -141,9 +169,38 @@
     </div>
   </section>
 
-  <section id="tab-fun" class="panel">
-    <pre id="tree"></pre>
-    <button id="grow" class="act">Вырастить новое дерево</button>
+  <!-- Экран 2: Заметки и Таблицы (стиль Obsidian) -->
+  <section id="tab-notes" class="panel">
+    <div class="card">
+      <h3>Мои заметки</h3>
+      <textarea id="note-content" rows="5" placeholder="Здесь можно писать текст, как в Obsidian..."></textarea>
+      <button id="save-note" class="act">Сохранить заметку</button>
+      <p id="note-status" style="margin-top: 10px; font-size: 13px; color: #55efc4;"></p>
+    </div>
+
+    <div class="card">
+      <h3>Таблица данных</h3>
+      <div class="table-container">
+        <table id="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Название</th>
+              <th>Статус</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- Строки таблицы будут здесь -->
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <input type="text" id="row-name" placeholder="Название" />
+        <input type="text" id="row-status" placeholder="Статус" />
+      </div>
+      <button id="add-row" class="act">Добавить строку</button>
+    </div>
   </section>
 
   <script type="module" src="/src/main.js"></script>
