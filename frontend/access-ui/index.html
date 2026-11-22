@@ -3,219 +3,215 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Access</title>
+  <title>BLACKJACK_77</title>
   <style>
-    :root {
-      --bg-dark: #0b0b12;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --bg-input: rgba(20, 20, 30, 0.4);
-      --primary: #a55eea;
-      --primary-grad: linear-gradient(135deg, #a55eea 0%, #c77dff 100%);
-      --text-main: #ffffff;
-      --text-sec: #a0a0b0;
-      --border: rgba(255, 255, 255, 0.08);
-      --radius: 16px;
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: var(--text-main);
-      background: var(--bg-dark);
+      background: #050505;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding-top: 20px;
-      padding-bottom: 20px;
+      padding: 16px;
+      font-family: 'Press Start 2P', monospace;
     }
 
-    .blob {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.4;
-      z-index: -1;
-      pointer-events: none;
-    }
-    .blob-1 { width: 60vmax; height: 60vmax; background: #a55eea; top: -30vmax; left: -20vmax; animation: drift 16s ease-in-out infinite alternate; }
-    .blob-2 { width: 50vmax; height: 50vmax; background: #c77dff; bottom: -25vmax; right: -15vmax; animation: drift 20s ease-in-out infinite alternate; }
-    @keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(25vmax, 20vmax) scale(1.15); } }
-
-    header {
+    /* Корпус автомата */
+    .machine {
       width: 100%;
       max-width: 420px;
-      padding: 0 16px 16px;
+      background: #111;
+      border: 3px solid #2a2a2a;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 0 40px rgba(0, 255, 60, 0.06);
+    }
+
+    /* CRT-экран */
+    .crt {
+      position: relative;
+      background: radial-gradient(ellipse at center, #0d3312 0%, #071f0b 70%, #041206 100%);
+      border: 4px solid #3a3a3a;
+      border-radius: 12px;
+      padding: 16px 12px;
+      min-height: 430px;
+      overflow: hidden;
+      color: #39ff5a;
+      text-shadow: 0 0 6px rgba(57, 255, 90, 0.7);
+    }
+    /* Сканлайны */
+    .crt::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.25) 0px,
+        rgba(0, 0, 0, 0.25) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+    }
+    /* Мерцание */
+    .crt::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(57, 255, 90, 0.02);
+      animation: flicker 0.12s infinite;
+      pointer-events: none;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+
+    .screen-inner { position: relative; z-index: 1; }
+
+    /* Лицо автомата (ASCII-пиксель) */
+    .face {
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.1;
+      white-space: pre;
+      margin-bottom: 10px;
+      animation: faceblink 4s infinite;
+    }
+    @keyframes faceblink {
+      0%, 92%, 100% { opacity: 1; }
+      94%, 96% { opacity: 0.3; }
+    }
+
+    /* Табло DEALER / COUNT */
+    .panel-row {
+      display: flex;
+      gap: 6px;
+      font-size: 9px;
+      margin-bottom: 8px;
+    }
+    .panel-box {
+      border: 2px solid #39ff5a;
+      padding: 6px 8px;
+      flex: 1;
+      background: rgba(57, 255, 90, 0.06);
+    }
+    .panel-box span { opacity: 0.9; }
+
+    /* Карты */
+    .cards-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+      min-height: 54px;
+    }
+    .card {
+      width: 40px;
+      height: 54px;
+      border: 2px solid #39ff5a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      background: rgba(57, 255, 90, 0.08);
+      animation: deal 0.25s ease-out;
+    }
+    .card.back { color: #39ff5a; }
+    @keyframes deal {
+      from { transform: translateY(-14px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .status-line {
+      font-size: 9px;
+      line-height: 1.7;
+      min-height: 40px;
+    }
+    .win { color: #b6ffcb; }
+    .lose { color: #ff5a5a; text-shadow: 0 0 6px rgba(255, 90, 90, 0.7); }
+
+    /* Кнопки */
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    button {
+      flex: 1;
+      padding: 12px 4px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      background: #0d3312;
+      color: #39ff5a;
+      border: 2px solid #39ff5a;
+      cursor: pointer;
+      text-shadow: 0 0 5px rgba(57, 255, 90, 0.7);
+      box-shadow: 0 0 10px rgba(57, 255, 90, 0.2);
+      transition: all 0.15s;
+    }
+    button:active { transform: scale(0.96); background: rgba(57, 255, 90, 0.2); }
+    button:disabled { opacity: 0.3; cursor: default; }
+    .bet-row { display: flex; gap: 8px; margin-top: 8px; position: relative; z-index: 1; }
+
+    /* Нижняя панель корпуса */
+    .base {
+      margin-top: 12px;
+      background: linear-gradient(180deg, #4a3826 0%, #332416 100%);
+      border-radius: 8px;
+      padding: 14px;
       text-align: center;
     }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 700;
-      background: var(--primary-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .slot {
+      background: #0a0a0a;
+      border: 3px solid #666;
+      border-radius: 4px;
+      padding: 10px;
+      color: #888;
+      font-size: 8px;
+      font-family: monospace;
     }
-    .subtitle { color: var(--text-sec); font-size: 14px; margin-top: 4px; }
-
-    .panel { width: 100%; max-width: 420px; padding: 0 16px; }
-
-    .card {
-      background: var(--bg-card);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-top: 16px;
-      box-shadow: var(--shadow);
-    }
-    .card h3 {
-      margin: 0 0 16px 0;
-      font-size: 18px;
-      font-weight: 600;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-      color: var(--text-main);
-      font-size: 15px;
-      margin-bottom: 12px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    input:focus { border-color: var(--primary); }
-
-    button.act {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: var(--primary-grad);
-      color: #fff;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(165, 94, 234, 0.3);
-      transition: transform 0.1s;
-    }
-    button.act:active { transform: scale(0.98); }
-
-    /* Чипы таблиц */
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .chip {
-      padding: 8px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-      color: var(--text-sec);
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .chip.active {
-      background: rgba(165, 94, 234, 0.25);
-      border-color: var(--primary);
-      color: #fff;
-    }
-    .empty-hint { color: var(--text-sec); font-size: 13px; margin: 10px 0 0; }
-
-    /* Таблица */
-    .table-container {
-      overflow-x: auto;
-      margin-top: 12px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.2);
-    }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-    th {
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text-sec);
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.5px;
-    }
-    tr:last-child td { border-bottom: none; }
-    tr:hover { background: rgba(255, 255, 255, 0.03); }
-
-    .action-btn {
-      background: #ff7675;
-      border: none;
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .del-table {
-      background: transparent;
-      border: 1px solid rgba(255, 118, 117, 0.5);
-      color: #ff7675;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
+  <div class="machine">
+    <div class="crt">
+      <div class="screen-inner">
+        <div class="face">┌○┐&nbsp;&nbsp;&nbsp;┌○┐<br>&nbsp;&nbsp;█&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;█&nbsp;<br>&nbsp;└─┐&nbsp;&nbsp;┌─┘</div>
 
-  <header>
-    <h1>Access</h1>
-    <div class="subtitle">Управление таблицами</div>
-  </header>
+        <div class="panel-row">
+          <div class="panel-box">DEALER: <span id="dealer-sum">?</span></div>
+          <div class="panel-box">COUNT: <span id="player-sum">0</span></div>
+        </div>
 
-  <section class="panel">
-    <!-- Создание таблиц -->
-    <div class="card">
-      <h3>Мои таблицы</h3>
-      <input type="text" id="new-table-name" placeholder="Название новой таблицы" />
-      <button id="create-table" class="act">Создать таблицу</button>
-      <div class="chips" id="table-chips"></div>
-      <p class="empty-hint" id="tables-hint">Создайте первую таблицу 👆</p>
+        <div class="cards-row" id="dealer-cards"></div>
+        <div class="cards-row" id="player-cards"></div>
+
+        <div class="status-line" id="status">&gt; INSERT COINS...<br>&gt; РАЗДАЙ КАРТЫ</div>
+      </div>
     </div>
 
-    <!-- Активная таблица -->
-    <div class="card" id="active-card" style="display: none;">
-      <h3><span id="active-title"></span><button id="delete-table" class="del-table">Удалить таблицу</button></h3>
-      <div class="table-container">
-        <table id="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Название</th>
-              <th>Статус</th>
-              <th>Действие</th>
-            </tr>
-          </thead>
-          <tbody id="table-body"></tbody>
-        </table>
-      </div>
-      <div class="input-row" style="margin-top: 15px;">
-        <input type="text" id="row-name" placeholder="Название" />
-        <input type="text" id="row-status" placeholder="Статус" />
-      </div>
-      <button id="add-row" class="act">Добавить строку</button>
+    <div class="controls">
+      <button id="deal">РАЗДАТЬ</button>
+      <button id="hit" disabled>ЕЩЁ</button>
+      <button id="stand" disabled>СТОП</button>
     </div>
-  </section>
+
+    <div class="bet-row">
+      <button id="bet10">+10</button>
+      <button id="bet50">+50</button>
+      <button id="bet100">+100</button>
+    </div>
+
+    <div class="base">
+      <div class="slot">CHIP: <span id="balance">100</span> | BET: <span id="bet">10</span></div>
+    </div>
+  </div>
 
   <script type="module" src="/src/main.js"></script>
 </body>
