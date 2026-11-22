@@ -32,7 +32,6 @@
       padding-bottom: 20px;
     }
 
-    /* Декоративные пятна (как на картинке) */
     .blob {
       position: fixed;
       border-radius: 50%;
@@ -58,19 +57,10 @@
       background: var(--primary-grad);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
     }
-    .subtitle {
-      color: var(--text-sec);
-      font-size: 14px;
-      margin-top: 4px;
-    }
+    .subtitle { color: var(--text-sec); font-size: 14px; margin-top: 4px; }
 
-    .panel {
-      width: 100%;
-      max-width: 420px;
-      padding: 0 16px;
-    }
+    .panel { width: 100%; max-width: 420px; padding: 0 16px; }
 
     .card {
       background: var(--bg-card);
@@ -85,13 +75,14 @@
     .card h3 {
       margin: 0 0 16px 0;
       font-size: 18px;
-      color: var(--text-main);
       font-weight: 600;
       border-bottom: 1px solid var(--border);
       padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    /* Поля ввода */
     input {
       width: 100%;
       padding: 14px;
@@ -106,7 +97,6 @@
     }
     input:focus { border-color: var(--primary); }
 
-    /* Кнопки */
     button.act {
       width: 100%;
       padding: 14px;
@@ -118,9 +108,28 @@
       font-size: 16px;
       cursor: pointer;
       box-shadow: 0 4px 14px rgba(165, 94, 234, 0.3);
-      transition: transform 0.1s, box-shadow 0.2s;
+      transition: transform 0.1s;
     }
     button.act:active { transform: scale(0.98); }
+
+    /* Чипы таблиц */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-sec);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip.active {
+      background: rgba(165, 94, 234, 0.25);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .empty-hint { color: var(--text-sec); font-size: 13px; margin: 10px 0 0; }
 
     /* Таблица */
     .table-container {
@@ -129,17 +138,8 @@
       border-radius: 12px;
       background: rgba(0, 0, 0, 0.2);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      color: var(--text-main);
-      font-size: 14px;
-    }
-    th, td {
-      padding: 12px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
     th {
       background: rgba(255, 255, 255, 0.03);
       color: var(--text-sec);
@@ -161,14 +161,17 @@
       font-weight: 600;
       cursor: pointer;
     }
-    .action-btn:active { transform: scale(0.95); }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
+    .del-table {
+      background: transparent;
+      border: 1px solid rgba(255, 118, 117, 0.5);
+      color: #ff7675;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
     }
+
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -177,12 +180,22 @@
 
   <header>
     <h1>Access</h1>
-    <div class="subtitle">Управление данными</div>
+    <div class="subtitle">Управление таблицами</div>
   </header>
 
   <section class="panel">
+    <!-- Создание таблиц -->
     <div class="card">
-      <h3>Данные</h3>
+      <h3>Мои таблицы</h3>
+      <input type="text" id="new-table-name" placeholder="Название новой таблицы" />
+      <button id="create-table" class="act">Создать таблицу</button>
+      <div class="chips" id="table-chips"></div>
+      <p class="empty-hint" id="tables-hint">Создайте первую таблицу 👆</p>
+    </div>
+
+    <!-- Активная таблица -->
+    <div class="card" id="active-card" style="display: none;">
+      <h3><span id="active-title"></span><button id="delete-table" class="del-table">Удалить таблицу</button></h3>
       <div class="table-container">
         <table id="data-table">
           <thead>
@@ -196,8 +209,7 @@
           <tbody id="table-body"></tbody>
         </table>
       </div>
-
-      <div class="input-row">
+      <div class="input-row" style="margin-top: 15px;">
         <input type="text" id="row-name" placeholder="Название" />
         <input type="text" id="row-status" placeholder="Статус" />
       </div>
