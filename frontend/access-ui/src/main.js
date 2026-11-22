@@ -32,33 +32,57 @@ btn.addEventListener('click', function () {
   }
 });
 
-// ---- Растущее дерево из иероглифов ----
-var LEAVES = '葉枝花榮茂椛樺';
+// ---- Растущее дерево в горшке ----
+var LEAVES = '葉枝花榮茂椛樺桂森楠苔萱蘭蕾華茂盛榮翠菁菱蕨蕾蔓藤薜荔萝荷菊楓梅柳桜';
 var TRUNK = '木';
 var ROOTS = '根';
-var GROUND = '土土土土土土土土土土土土土土土土';
+
+// Горшок из символов (ширина задана под кадр 30 знаков)
+var POT = [
+  '   ╭───────────────╮   ',
+  '  ╭╯               ╰╮  ',
+  ' ╭╯   土  器  土   ╰╮  ',
+  ' ╰╮               ╭╯  ',
+  '  ╰╮             ╭╯   ',
+  '   ╰─────────────╯    ',
+  '  ╰╮             ╭╯   ',
+  '   ╰─────────────╯    '
+];
 
 function buildTree() {
-  var height = 11;
-  var maxW = 13;
+  var width = 23;          // ширина кроны
+  var crown = 13;          // строк кроны
+  var trunk = 5;           // строк ствола
   var lines = [];
-  for (var i = 0; i < height; i++) {
-    var w = 1 + Math.floor((i / height) * maxW);
-    var pad = Math.floor((maxW - w) / 2) + 4;
+
+  // Крона: широкая, плотная, до width знаков в строке
+  for (var i = 0; i < crown; i++) {
+    // ширина слоя растёт от 5 до width, с лёгкой "рваностью" краёв
+    var base = 5 + Math.floor((i / crown) * (width - 5));
+    var wobble = Math.floor(Math.random() * 5) - 2;
+    var w = Math.max(4, Math.min(width, base + wobble));
+    var pad = Math.floor((width - w) / 2) + 3;
     var row = '';
     for (var c = 0; c < w; c++) {
-      row += Math.random() < 0.85
-        ? LEAVES.charAt(Math.floor(Math.random() * LEAVES.length))
-        : ' ';
+      row += Math.random() < 0.12
+        ? ' '  // просветы, чтобы крона дышала
+        : LEAVES.charAt(Math.floor(Math.random() * LEAVES.length));
     }
     lines.push(' '.repeat(pad) + row);
   }
-  var tp = Math.floor(maxW / 2) + 3;
-  lines.push(' '.repeat(tp) + '丨');
-  lines.push(' '.repeat(tp) + TRUNK);
-  lines.push(' '.repeat(tp) + TRUNK);
-  lines.push(' '.repeat(tp - 1) + ROOTS + TRUNK + ROOTS);
-  lines.push(GROUND);
+
+  // Ствол: три 木 в ряд
+  var tp = Math.floor(width / 2) + 1;
+  for (var t = 0; t < trunk; t++) {
+    lines.push(' '.repeat(tp - 1) + TRUNK + TRUNK + TRUNK);
+  }
+
+  // Корни над горшком
+  lines.push(' '.repeat(tp - 2) + ROOTS + ROOTS + TRUNK + ROOTS + ROOTS);
+
+  // Горшок
+  POT.forEach(function (p) { lines.push(p); });
+
   return lines;
 }
 
@@ -71,14 +95,15 @@ function growTree() {
   treeEl.style.color = '#7bed9f';
   var lines = buildTree();
   var i = 0;
+  // Растёт снизу вверх: рисуем с последней строки к первой
   timer = setInterval(function () {
-    treeEl.textContent += lines[i] + '\n';
+    treeEl.textContent = lines[lines.length - 1 - i] + '\n' + treeEl.textContent;
     i++;
     if (i >= lines.length) {
       clearInterval(timer);
-      treeEl.style.color = '#f9ca24'; // дерево "зацвело" — золотеет
+      treeEl.style.color = '#f9ca24'; // крона "золотеет"
     }
-  }, 600);
+  }, 450);
 }
 
 document.getElementById('grow').addEventListener('click', growTree);
