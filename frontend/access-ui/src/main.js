@@ -3,7 +3,7 @@ var rowNameInput = document.getElementById('row-name');
 var rowStatusInput = document.getElementById('row-status');
 var addRowBtn = document.getElementById('add-row');
 
-var tableData = JSON.parse(localStorage.getItem('user_table')) || ;
+var tableData = JSON.parse(localStorage.getItem('user_table')) || [];
 var nextId = tableData.length > 0 ? Math.max.apply(null, tableData.map(function (r) { return r.id; })) + 1 : 1;
 
 function renderTable() {
