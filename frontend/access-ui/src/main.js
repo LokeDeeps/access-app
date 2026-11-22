@@ -1,18 +1,19 @@
-const { invoke } = window.__TAURI__.core;
+const app = document.querySelector('.card');
+const pin = document.getElementById('pin');
+const btn = document.getElementById('go');
+const msg = document.getElementById('msg');
 
-let greetInputEl;
-let greetMsgEl;
+const CORRECT_PIN = '1234';
 
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsgEl.textContent = await invoke("greet", { name: greetInputEl.value });
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
-  });
+btn.addEventListener('click', () => {
+  if (pin.value === CORRECT_PIN) {
+    msg.style.color = '#55efc4';
+    msg.textContent = 'Доступ разрешён';
+    setTimeout(() => {
+      app.innerHTML = '<h1>Добро пожаловать!</h1><p>Приложение работает.</p>';
+    }, 800);
+  } else {
+    msg.textContent = 'Неверный PIN';
+    pin.value = '';
+  }
 });

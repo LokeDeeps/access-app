@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Access</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #1a1a2e; color: #eee;
+           display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { text-align: center; padding: 24px; border-radius: 16px; background: #24243e; width: 280px; }
+    input { width: 100%; padding: 12px; font-size: 20px; text-align: center;
+            border: none; border-radius: 8px; box-sizing: border-box; margin: 12px 0; }
+    button { width: 100%; padding: 12px; font-size: 18px; border: none; border-radius: 8px;
+             background: #6c5ce7; color: white; cursor: pointer; }
+    #msg { min-height: 20px; color: #ff7675; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Access</h1>
+    <p>Введите PIN</p>
+    <input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" />
+    <button id="go">Войти</button>
+    <p id="msg"></p>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
